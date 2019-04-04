@@ -10,33 +10,44 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Range;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * @author n0172808
  * Task Entity Definition
  */
 @Entity
-public class Task {
+@Table(name="task")
+public class Task{
 	
 	@Id
 	@GeneratedValue
+	@Column(name="task_id")
 	private Long taskId;
 	@NotNull
-	@Column(name="taskDesc")
+	@Column(name="task_desc")
 	private String task;
+	@Column(name="start_date")
 	private Date startDate;
+	@Column(name="end_date")
 	private Date endDate;
 	@Range(min=0, max=30)
 	private int priority;
 	
-	@ManyToOne
-	private ParentTask parentTask;
+	@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="parent_parent_id")
+	@JsonBackReference // Needed for two serialized object mapping entities to break out of infinite JSON recurrence
+	private Parent parent;
 
 	/**
 	 * @return the taskId
@@ -107,19 +118,19 @@ public class Task {
 	public void setPriority(int priority) {
 		this.priority = priority;
 	}
-
+	
 	/**
 	 * @return the parentTask
 	 */
-	public ParentTask getParentTask() {
-		return parentTask;
+	public Parent getParent() {
+		return parent;
 	}
 
 	/**
 	 * @param parentTask the parentTask to set
 	 */
-	public void setParentTask(ParentTask parentTask) {
-		this.parentTask = parentTask;
+	public void setParentTask(Parent parent) {
+		this.parent = parent;
 	}
 	
 }
